@@ -6,7 +6,7 @@ import { defineConfig } from "vite"
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: process.env.NODE_ENV === 'production' ? '/boilerplate-shadcn-stone/' : '/',
+  base: process.env.NODE_ENV === 'production' ? '/cursor-mobile/' : '/',
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
