@@ -70,14 +70,8 @@ export function Settings({ currentWallpaper, onWallpaperChange }: SettingsProps)
   ]
 
   return (
-    <div className="min-h-screen bg-stone-50 p-4">
-      <div className="max-w-sm mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-stone-800 mb-2">Settings</h2>
-          <p className="text-stone-600">Customize your app launcher</p>
-        </div>
-
+    <div className="min-h-screen bg-stone-50 overflow-y-auto">
+      <div className="max-w-sm mx-auto p-4 pt-8">
         {/* Wallpaper Section */}
         <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-stone-200">
           <h3 className="text-lg font-semibold text-stone-800 mb-4">Wallpaper</h3>
