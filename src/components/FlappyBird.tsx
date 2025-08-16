@@ -1,24 +1,12 @@
 import { useState, useEffect, useRef } from "react"
 import { Play, RotateCcw } from "lucide-react"
 
-type Bird = {
-  y: number
-  velocity: number
-}
-
-type Pipe = {
-  x: number
-  topHeight: number
-  bottomY: number
-  passed: boolean
-}
-
 const FlappyBird = () => {
   const [gameState, setGameState] = useState<'instructions' | 'playing' | 'gameOver'>('instructions')
   const [score, setScore] = useState(0)
   const [highScore, setHighScore] = useState(0)
-  const [bird, setBird] = useState<Bird>({ y: 300, velocity: 0 })
-  const [pipes, setPipes] = useState<Pipe[]>([])
+  const [bird, setBird] = useState({ y: 300, velocity: 0 })
+  const [pipes, setPipes] = useState<any[]>([])
   const [gameSpeed, setGameSpeed] = useState(3)
   
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -30,21 +18,28 @@ const FlappyBird = () => {
   const BIRD_SIZE = 20
 
   const startGame = () => {
-    console.log('Starting game...') // Debug log
+    console.log('=== START GAME CLICKED ===')
+    console.log('Current gameState:', gameState)
+    console.log('Setting gameState to playing...')
+    
     setGameState('playing')
     setScore(0)
     setBird({ y: 300, velocity: 0 })
     setPipes([])
     setGameSpeed(3)
+    
+    console.log('startGame function completed')
   }
 
   const flap = () => {
+    console.log('Flap called, gameState:', gameState)
     if (gameState === 'playing') {
       setBird(prev => ({ ...prev, velocity: FLAP_STRENGTH }))
     }
   }
 
   const gameOver = () => {
+    console.log('Game over called')
     setGameState('gameOver')
     if (gameLoopRef.current) {
       cancelAnimationFrame(gameLoopRef.current)
@@ -56,8 +51,10 @@ const FlappyBird = () => {
 
   // Game loop
   useEffect(() => {
+    console.log('Game loop effect triggered, gameState:', gameState)
+    
     if (gameState === 'playing') {
-      console.log('Game loop started') // Debug log
+      console.log('=== GAME LOOP STARTING ===')
       
       const gameLoop = () => {
         // Update bird
@@ -82,7 +79,7 @@ const FlappyBird = () => {
 
           // Spawn new pipes every 2 seconds
           if (Math.random() < 0.02) {
-            const newPipe: Pipe = {
+            const newPipe = {
               x: 800,
               topHeight: Math.random() * 200 + 100,
               bottomY: Math.random() * 200 + 350,
@@ -207,45 +204,7 @@ const FlappyBird = () => {
     }
   }, [gameState, bird.y, pipes, score])
 
-  const renderInstructions = () => (
-    <div className="fixed inset-0 bg-stone-50 flex items-center justify-center p-4 z-50">
-      <div className="text-center max-w-md">
-        <h1 className="text-4xl font-bold text-stone-800 mb-6">Flappy Bird</h1>
-        <div className="space-y-4 text-stone-600 mb-8">
-          <p>Tap or press Space to flap!</p>
-          <p>Avoid the pipes and try to get the highest score.</p>
-        </div>
-        <button
-          onClick={startGame}
-          className="px-8 py-4 bg-stone-900 text-stone-50 text-xl font-medium rounded-lg hover:bg-stone-800 active:bg-stone-700 transition-colors shadow-lg"
-        >
-          <Play className="w-6 h-6 inline mr-2" />
-          Start Game
-        </button>
-      </div>
-    </div>
-  )
-
-  const renderGameOver = () => (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center">
-        <h2 className="text-3xl font-bold text-stone-800 mb-4">Game Over!</h2>
-        <p className="text-stone-600 mb-2">Final Score: {score}</p>
-        {score > highScore && (
-          <p className="text-green-600 font-medium mb-4">New High Score! 🎉</p>
-        )}
-        <div>
-          <button
-            onClick={startGame}
-            className="w-full px-8 py-3 bg-stone-900 text-stone-50 text-lg font-medium rounded-lg hover:bg-stone-800 active:bg-stone-700 transition-colors shadow-lg"
-          >
-            <RotateCcw className="w-5 h-5 inline mr-2" />
-            Play Again
-          </button>
-        </div>
-      </div>
-    </div>
-  )
+  console.log('FlappyBird render - gameState:', gameState)
 
   return (
     <div className="fixed inset-0 bg-stone-50">
@@ -257,8 +216,48 @@ const FlappyBird = () => {
         style={{ display: 'block' }}
       />
       
-      {gameState === 'instructions' && renderInstructions()}
-      {gameState === 'gameOver' && renderGameOver()}
+      {gameState === 'instructions' && (
+        <div className="fixed inset-0 bg-stone-50 flex items-center justify-center p-4 z-50">
+          <div className="text-center max-w-md">
+            <h1 className="text-4xl font-bold text-stone-800 mb-6">Flappy Bird</h1>
+            <div className="space-y-4 text-stone-600 mb-8">
+              <p>Tap or press Space to flap!</p>
+              <p>Avoid the pipes and try to get the highest score.</p>
+            </div>
+            <button
+              onClick={() => {
+                console.log('Button clicked!')
+                startGame()
+              }}
+              className="px-8 py-4 bg-stone-900 text-stone-50 text-xl font-medium rounded-lg hover:bg-stone-800 active:bg-stone-700 transition-colors shadow-lg"
+            >
+              <Play className="w-6 h-6 inline mr-2" />
+              Start Game
+            </button>
+          </div>
+        </div>
+      )}
+      
+      {gameState === 'gameOver' && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center">
+            <h2 className="text-3xl font-bold text-stone-800 mb-4">Game Over!</h2>
+            <p className="text-stone-600 mb-2">Final Score: {score}</p>
+            {score > highScore && (
+              <p className="text-green-600 font-medium mb-4">New High Score! 🎉</p>
+            )}
+            <div>
+              <button
+                onClick={startGame}
+                className="w-full px-8 py-3 bg-stone-900 text-stone-50 text-lg font-medium rounded-lg hover:bg-stone-800 active:bg-stone-700 transition-colors shadow-lg"
+              >
+                <RotateCcw className="w-5 h-5 inline mr-2" />
+                Play Again
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
