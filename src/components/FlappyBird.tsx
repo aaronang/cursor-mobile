@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Play, RotateCcw } from "lucide-react"
 
 type Bird = {
@@ -23,7 +23,6 @@ const FlappyBird = () => {
   
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const gameLoopRef = useRef<number | undefined>(undefined)
-  const lastTimeRef = useRef<number | undefined>(undefined)
 
   const GRAVITY = 0.5
   const FLAP_STRENGTH = -8
@@ -31,6 +30,7 @@ const FlappyBird = () => {
   const BIRD_SIZE = 20
 
   const startGame = () => {
+    console.log('Starting game...') // Debug log
     setGameState('playing')
     setScore(0)
     setBird({ y: 300, velocity: 0 })
@@ -54,75 +54,64 @@ const FlappyBird = () => {
     }
   }
 
-  const updateGame = useCallback(() => {
-    if (gameState !== 'playing') return
-
-    // Update bird
-    setBird(prev => {
-      const newVelocity = prev.velocity + GRAVITY
-      const newY = prev.y + newVelocity
-      
-      // Check if bird hits ground or ceiling
-      if (newY <= 0 || newY >= 600) {
-        gameOver()
-        return prev
-      }
-      
-      return { y: newY, velocity: newVelocity }
-    })
-
-    // Update pipes
-    setPipes(prev => {
-      const newPipes = prev
-        .map(pipe => ({ ...pipe, x: pipe.x - gameSpeed }))
-        .filter(pipe => pipe.x > -PIPE_WIDTH)
-
-      // Spawn new pipes every 2 seconds
-      if (Math.random() < 0.02) { // 2% chance per frame at 60fps ≈ every 2 seconds
-        const newPipe: Pipe = {
-          x: 800,
-          topHeight: Math.random() * 200 + 100,
-          bottomY: Math.random() * 200 + 350,
-          passed: false
-        }
-        newPipes.push(newPipe)
-      }
-
-      return newPipes
-    })
-
-    // Check collisions
-    setPipes(prev => {
-      return prev.map(pipe => {
-        // Check if bird passed pipe
-        if (!pipe.passed && pipe.x + PIPE_WIDTH < 200) {
-          setScore(s => s + 1)
-          return { ...pipe, passed: true }
-        }
-
-        // Check collision with pipe
-        if (200 < pipe.x + PIPE_WIDTH && 200 + BIRD_SIZE > pipe.x) {
-          if (bird.y < pipe.topHeight || bird.y + BIRD_SIZE > pipe.bottomY) {
-            gameOver()
-          }
-        }
-
-        return pipe
-      })
-    })
-
-    // Increase difficulty
-    setGameSpeed(prev => Math.min(prev + 0.001, 8))
-  }, [gameState, bird.y, gameSpeed])
-
   // Game loop
   useEffect(() => {
     if (gameState === 'playing') {
-      const gameLoop = (currentTime: number) => {
-        updateGame()
-        lastTimeRef.current = currentTime
+      console.log('Game loop started') // Debug log
+      
+      const gameLoop = () => {
+        // Update bird
+        setBird(prev => {
+          const newVelocity = prev.velocity + GRAVITY
+          const newY = prev.y + newVelocity
+          
+          // Check if bird hits ground or ceiling
+          if (newY <= 0 || newY >= 600) {
+            gameOver()
+            return prev
+          }
+          
+          return { y: newY, velocity: newVelocity }
+        })
+
+        // Update pipes
+        setPipes(prev => {
+          const newPipes = prev
+            .map(pipe => ({ ...pipe, x: pipe.x - gameSpeed }))
+            .filter(pipe => pipe.x > -PIPE_WIDTH)
+
+          // Spawn new pipes every 2 seconds
+          if (Math.random() < 0.02) {
+            const newPipe: Pipe = {
+              x: 800,
+              topHeight: Math.random() * 200 + 100,
+              bottomY: Math.random() * 200 + 350,
+              passed: false
+            }
+            newPipes.push(newPipe)
+          }
+
+          return newPipes
+        })
+
+        // Check collisions and score
+        setPipes(prev => {
+          return prev.map(pipe => {
+            if (!pipe.passed && pipe.x + PIPE_WIDTH < 200) {
+              setScore(s => s + 1)
+              return { ...pipe, passed: true }
+            }
+            return pipe
+          })
+        })
+
+        // Increase difficulty
+        setGameSpeed(prev => Math.min(prev + 0.001, 8))
+
+        // Continue game loop
         gameLoopRef.current = requestAnimationFrame(gameLoop)
       }
+
       gameLoopRef.current = requestAnimationFrame(gameLoop)
     }
 
@@ -131,7 +120,20 @@ const FlappyBird = () => {
         cancelAnimationFrame(gameLoopRef.current)
       }
     }
-  }, [gameState, updateGame])
+  }, [gameState, gameSpeed])
+
+  // Collision detection
+  useEffect(() => {
+    if (gameState === 'playing') {
+      pipes.forEach(pipe => {
+        if (200 < pipe.x + PIPE_WIDTH && 200 + BIRD_SIZE > pipe.x) {
+          if (bird.y < pipe.topHeight || bird.y + BIRD_SIZE > pipe.bottomY) {
+            gameOver()
+          }
+        }
+      })
+    }
+  }, [gameState, pipes, bird.y])
 
   // Handle input
   useEffect(() => {
