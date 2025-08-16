@@ -120,11 +120,6 @@ export function Settings({ currentWallpaper, onWallpaperChange }: SettingsProps)
             </span>
           </div>
         </div>
-
-        {/* Instructions */}
-        <div className="mt-8 text-center text-stone-600 text-sm">
-          <p>Changes apply immediately to your app launcher</p>
-        </div>
       </div>
     </div>
   )
