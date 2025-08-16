@@ -22,11 +22,13 @@ export function Runner() {
   const [obstacles, setObstacles] = useState<Obstacle[]>([])
   const [gameSpeed, setGameSpeed] = useState(3)
   const [obstacleSpawnRate, setObstacleSpawnRate] = useState(0)
+  const [keysPressed, setKeysPressed] = useState<Set<string>>(new Set())
 
   const PLAYER_WIDTH = 30
   const PLAYER_HEIGHT = 30
   const CANVAS_WIDTH = 400
   const CANVAS_HEIGHT = 600
+  const PLAYER_MOVE_SPEED = 5
 
   // Initialize game
   useEffect(() => {
@@ -47,24 +49,32 @@ export function Runner() {
     setScore(prev => prev + 1)
     setObstacleSpawnRate(prev => prev + 1)
 
-    // Move obstacles up
+    // Move obstacles down
     setObstacles(prev => 
       prev
-        .map(obs => ({ ...obs, y: obs.y - gameSpeed }))
-        .filter(obs => obs.y + obs.height > 0)
+        .map(obs => ({ ...obs, y: obs.y + gameSpeed }))
+        .filter(obs => obs.y < CANVAS_HEIGHT)
     )
 
-    // Spawn new obstacles
+    // Spawn new obstacles from top
     if (obstacleSpawnRate > 50) {
       const newObstacle: Obstacle = {
         x: Math.random() * (CANVAS_WIDTH - 60),
-        y: CANVAS_HEIGHT,
+        y: -20, // Start above the canvas
         width: 60,
         height: 20,
         type: Math.random() > 0.7 ? 'large' : Math.random() > 0.5 ? 'medium' : 'small'
       }
       setObstacles(prev => [...prev, newObstacle])
       setObstacleSpawnRate(0)
+    }
+
+    // Handle continuous player movement
+    if (keysPressed.has('ArrowLeft') || keysPressed.has('a') || keysPressed.has('A')) {
+      setPlayerX(prev => Math.max(0, prev - PLAYER_MOVE_SPEED))
+    }
+    if (keysPressed.has('ArrowRight') || keysPressed.has('d') || keysPressed.has('D')) {
+      setPlayerX(prev => Math.min(CANVAS_WIDTH - PLAYER_WIDTH, prev + PLAYER_MOVE_SPEED))
     }
 
     // Check collisions
@@ -93,29 +103,37 @@ export function Runner() {
     }
 
     gameLoopRef.current = requestAnimationFrame(gameLoop)
-  }, [gameState, score, obstacles, playerX, gameSpeed, obstacleSpawnRate])
+  }, [gameState, score, obstacles, playerX, gameSpeed, obstacleSpawnRate, keysPressed])
 
   // Handle player movement
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (gameState !== 'playing') return
 
-      switch (e.key) {
-        case 'ArrowLeft':
-        case 'a':
-        case 'A':
-          setPlayerX(prev => Math.max(0, prev - 20))
-          break
-        case 'ArrowRight':
-        case 'd':
-        case 'D':
-          setPlayerX(prev => Math.min(CANVAS_WIDTH - PLAYER_WIDTH, prev + 20))
-          break
+      const key = e.key.toLowerCase()
+      if (['arrowleft', 'arrowright', 'a', 'd'].includes(key)) {
+        e.preventDefault()
+        setKeysPressed(prev => new Set(prev).add(e.key))
+      }
+    }
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      const key = e.key.toLowerCase()
+      if (['arrowleft', 'arrowright', 'a', 'd'].includes(key)) {
+        setKeysPressed(prev => {
+          const newSet = new Set(prev)
+          newSet.delete(e.key)
+          return newSet
+        })
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+    }
   }, [gameState])
 
   // Touch controls for mobile
@@ -143,6 +161,7 @@ export function Runner() {
     setObstacles([])
     setGameSpeed(3)
     setObstacleSpawnRate(0)
+    setKeysPressed(new Set())
   }
 
   const pauseGame = () => {
@@ -217,7 +236,7 @@ export function Runner() {
   const renderMenu = () => (
     <div className="text-center">
       <h2 className="text-3xl font-bold text-stone-800 mb-4">Runner</h2>
-      <p className="text-stone-600 mb-6">Dodge obstacles and run as far as you can!</p>
+      <p className="text-stone-600 mb-6">Dodge falling obstacles and survive as long as you can!</p>
       <button
         onClick={startGame}
         className="inline-flex items-center gap-2 px-8 py-3 bg-stone-900 text-stone-50 text-lg font-medium rounded-lg hover:bg-stone-800 active:bg-stone-700 transition-colors shadow-lg"
@@ -307,9 +326,9 @@ export function Runner() {
 
         {/* Instructions */}
         <div className="mt-6 text-center text-stone-600 text-sm">
-          <p>• Use A/D or Arrow Keys to move</p>
+          <p>• Hold A/D or Arrow Keys to move continuously</p>
           <p>• Tap left/right on mobile</p>
-          <p>• Dodge obstacles and survive!</p>
+          <p>• Dodge falling obstacles and survive!</p>
         </div>
       </div>
     </div>
