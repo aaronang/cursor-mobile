@@ -113,15 +113,13 @@ const FlappyBird = () => {
 
     // Increase difficulty
     setGameSpeed(prev => Math.min(prev + 0.001, 8))
-  }, [gameState, bird.y])
+  }, [gameState, bird.y, gameSpeed])
 
   // Game loop
   useEffect(() => {
     if (gameState === 'playing') {
       const gameLoop = (currentTime: number) => {
-        if (lastTimeRef.current !== undefined) {
-          updateGame()
-        }
+        updateGame()
         lastTimeRef.current = currentTime
         gameLoopRef.current = requestAnimationFrame(gameLoop)
       }
