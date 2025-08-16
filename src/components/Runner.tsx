@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react"
-import { Play, Pause } from "lucide-react"
+import { Play, RotateCcw, X } from "lucide-react"
 
 type GameObject = {
   x: number
@@ -15,7 +15,7 @@ type Obstacle = GameObject & {
 export function Runner() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const gameLoopRef = useRef<number | undefined>(undefined)
-  const [gameState, setGameState] = useState<'menu' | 'playing' | 'paused' | 'gameOver'>('menu')
+  const [gameState, setGameState] = useState<'instructions' | 'playing' | 'paused' | 'gameOver'>('instructions')
   const [score, setScore] = useState(0)
   const [highScore, setHighScore] = useState(0)
   const [playerX, setPlayerX] = useState(200)
@@ -26,8 +26,8 @@ export function Runner() {
 
   const PLAYER_WIDTH = 30
   const PLAYER_HEIGHT = 30
-  const CANVAS_WIDTH = 400
-  const CANVAS_HEIGHT = 600
+  const CANVAS_WIDTH = window.innerWidth
+  const CANVAS_HEIGHT = window.innerHeight
   const PLAYER_MOVE_SPEED = 5
 
   // Initialize game
@@ -38,8 +38,9 @@ export function Runner() {
     const ctx = canvas.getContext('2d')
     if (!canvas || !ctx) return
 
-    canvas.width = CANVAS_WIDTH
-    canvas.height = CANVAS_HEIGHT
+    // Set canvas to full screen
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
   }, [])
 
   // Game loop
@@ -103,7 +104,7 @@ export function Runner() {
     }
 
     gameLoopRef.current = requestAnimationFrame(gameLoop)
-  }, [gameState, score, obstacles, playerX, gameSpeed, obstacleSpawnRate, keysPressed])
+  }, [gameState, score, obstacles, playerX, gameSpeed, obstacleSpawnRate, keysPressed, CANVAS_WIDTH, CANVAS_HEIGHT])
 
   // Handle player movement
   useEffect(() => {
@@ -157,7 +158,7 @@ export function Runner() {
   const startGame = () => {
     setGameState('playing')
     setScore(0)
-    setPlayerX(200)
+    setPlayerX(CANVAS_WIDTH / 2 - PLAYER_WIDTH / 2)
     setObstacles([])
     setGameSpeed(3)
     setObstacleSpawnRate(0)
@@ -183,6 +184,16 @@ export function Runner() {
     if (score > highScore) {
       setHighScore(score)
     }
+  }
+
+  const quitGame = () => {
+    setGameState('instructions')
+    setScore(0)
+    setPlayerX(CANVAS_WIDTH / 2 - PLAYER_WIDTH / 2)
+    setObstacles([])
+    setGameSpeed(3)
+    setObstacleSpawnRate(0)
+    setKeysPressed(new Set())
   }
 
   // Start game loop when playing
@@ -231,106 +242,105 @@ export function Runner() {
     ctx.font = '20px Arial'
     ctx.fillText(`Score: ${score}`, 10, 30)
     ctx.fillText(`High Score: ${highScore}`, 10, 60)
-  }, [playerX, obstacles, score, highScore])
+  }, [playerX, obstacles, score, highScore, CANVAS_WIDTH, CANVAS_HEIGHT])
 
-  const renderMenu = () => (
-    <div className="text-center">
-      <h2 className="text-3xl font-bold text-stone-800 mb-4">Runner</h2>
-      <p className="text-stone-600 mb-6">Dodge falling obstacles and survive as long as you can!</p>
-      <button
-        onClick={startGame}
-        className="inline-flex items-center gap-2 px-8 py-3 bg-stone-900 text-stone-50 text-lg font-medium rounded-lg hover:bg-stone-800 active:bg-stone-700 transition-colors shadow-lg"
-      >
-        <Play className="w-5 h-5" />
-        Start Game
-      </button>
-      {highScore > 0 && (
-        <p className="mt-4 text-stone-500">High Score: {highScore}</p>
-      )}
+  const renderInstructions = () => (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center">
+        <h2 className="text-3xl font-bold text-stone-800 mb-4">Runner</h2>
+        <p className="text-stone-600 mb-6">Dodge falling obstacles and survive as long as you can!</p>
+        
+        <div className="text-left text-sm text-stone-600 mb-6 space-y-2">
+          <p>• Hold A/D or Arrow Keys to move continuously</p>
+          <p>• Tap left/right on mobile</p>
+          <p>• Dodge falling obstacles and survive!</p>
+        </div>
+
+        <button
+          onClick={startGame}
+          className="inline-flex items-center gap-2 px-8 py-3 bg-stone-900 text-stone-50 text-lg font-medium rounded-lg hover:bg-stone-800 active:bg-stone-700 transition-colors shadow-lg"
+        >
+          <Play className="w-5 h-5" />
+          Start Game
+        </button>
+        
+        {highScore > 0 && (
+          <p className="mt-4 text-stone-500">High Score: {highScore}</p>
+        )}
+      </div>
     </div>
   )
 
   const renderGameOver = () => (
-    <div className="text-center">
-      <h2 className="text-3xl font-bold text-stone-800 mb-4">Game Over!</h2>
-      <p className="text-stone-600 mb-2">Final Score: {score}</p>
-      {score > highScore && (
-        <p className="text-green-600 font-medium mb-4">New High Score! 🎉</p>
-      )}
-      <div className="space-y-3">
-        <button
-          onClick={startGame}
-          className="block w-full px-8 py-3 bg-stone-900 text-stone-50 text-lg font-medium rounded-lg hover:bg-stone-800 active:bg-stone-700 transition-colors shadow-lg"
-        >
-          Play Again
-        </button>
-        <button
-          onClick={() => setGameState('menu')}
-          className="block w-full px-8 py-3 bg-stone-200 text-stone-800 text-lg font-medium rounded-lg hover:bg-stone-300 transition-colors"
-        >
-          Main Menu
-        </button>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center">
+        <h2 className="text-3xl font-bold text-stone-800 mb-4">Game Over!</h2>
+        <p className="text-stone-600 mb-2">Final Score: {score}</p>
+        {score > highScore && (
+          <p className="text-green-600 font-medium mb-4">New High Score! 🎉</p>
+        )}
+        <div className="space-y-3">
+          <button
+            onClick={startGame}
+            className="block w-full px-8 py-3 bg-stone-900 text-stone-50 text-lg font-medium rounded-lg hover:bg-stone-800 active:bg-stone-700 transition-colors shadow-lg"
+          >
+            <RotateCcw className="w-5 h-5 inline mr-2" />
+            Play Again
+          </button>
+          <button
+            onClick={quitGame}
+            className="block w-full px-8 py-3 bg-stone-200 text-stone-800 text-lg font-medium rounded-lg hover:bg-stone-300 transition-colors"
+          >
+            <X className="w-5 h-5 inline mr-2" />
+            Quit
+          </button>
+        </div>
       </div>
     </div>
   )
 
   return (
-    <div className="min-h-screen bg-stone-50 p-4">
-      <div className="max-w-md mx-auto">
-        {/* Game Canvas */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-stone-200 mb-4">
-          <canvas
-            ref={canvasRef}
-            onTouchStart={handleTouch}
-            className="w-full border border-stone-200 rounded-lg cursor-pointer"
-            style={{ height: CANVAS_HEIGHT * 0.8 }}
-          />
-        </div>
+    <div className="fixed inset-0 bg-stone-50">
+      {/* Game Canvas - Full Screen */}
+      <canvas
+        ref={canvasRef}
+        onTouchStart={handleTouch}
+        className="w-full h-full cursor-pointer"
+      />
 
-        {/* Game Controls */}
-        {gameState === 'playing' && (
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-stone-200 mb-4">
-            <div className="flex items-center justify-between">
-              <span className="text-stone-600">Score: {score}</span>
-              <button
-                onClick={pauseGame}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-stone-900 text-stone-50 font-medium rounded-lg hover:bg-stone-800 active:bg-stone-700 transition-colors shadow-sm"
-              >
-                <Pause className="w-4 h-4" />
-                Pause
-              </button>
-            </div>
+      {/* Game Controls - Only show when playing */}
+      {gameState === 'playing' && (
+        <div className="absolute top-4 right-4">
+          <button
+            onClick={pauseGame}
+            className="px-4 py-2 bg-stone-900 text-stone-50 font-medium rounded-lg hover:bg-stone-800 active:bg-stone-700 transition-colors shadow-lg"
+          >
+            Pause
+          </button>
+        </div>
+      )}
+
+      {/* Pause Screen */}
+      {gameState === 'paused' && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl p-8 text-center">
+            <h2 className="text-2xl font-bold text-stone-800 mb-4">Game Paused</h2>
+            <button
+              onClick={resumeGame}
+              className="inline-flex items-center gap-2 px-6 py-2 bg-stone-900 text-stone-50 font-medium rounded-lg hover:bg-stone-800 active:bg-stone-700 transition-colors shadow-sm"
+            >
+              <Play className="w-4 h-4" />
+              Resume
+            </button>
           </div>
-        )}
-
-        {gameState === 'paused' && (
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-stone-200 mb-4">
-            <div className="text-center">
-              <p className="text-stone-600 mb-3">Game Paused</p>
-              <button
-                onClick={resumeGame}
-                className="inline-flex items-center gap-2 px-6 py-2 bg-stone-900 text-stone-50 font-medium rounded-lg hover:bg-stone-800 active:bg-stone-700 transition-colors shadow-sm"
-              >
-                <Play className="w-4 h-4" />
-                Resume
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Game Content */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-stone-200">
-          {gameState === 'menu' && renderMenu()}
-          {gameState === 'gameOver' && renderGameOver()}
         </div>
+      )}
 
-        {/* Instructions */}
-        <div className="mt-6 text-center text-stone-600 text-sm">
-          <p>• Hold A/D or Arrow Keys to move continuously</p>
-          <p>• Tap left/right on mobile</p>
-          <p>• Dodge falling obstacles and survive!</p>
-        </div>
-      </div>
+      {/* Instructions Screen */}
+      {gameState === 'instructions' && renderInstructions()}
+
+      {/* Game Over Dialog */}
+      {gameState === 'gameOver' && renderGameOver()}
     </div>
   )
 }
