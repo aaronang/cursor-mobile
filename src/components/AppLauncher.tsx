@@ -7,15 +7,9 @@ interface AppLauncherProps {
 
 export function AppLauncher({ apps, onAppOpen }: AppLauncherProps) {
   return (
-    <div className="min-h-screen p-4">
-      {/* Header */}
-      <div className="text-center mb-8 pt-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">App Launcher</h1>
-        <p className="text-gray-600">Tap an app to open</p>
-      </div>
-
+    <div className="min-h-screen p-4 bg-stone-50">
       {/* App Grid */}
-      <div className="grid grid-cols-3 gap-6 max-w-sm mx-auto">
+      <div className="grid grid-cols-3 gap-6 max-w-sm mx-auto pt-20">
         {apps.map((app) => (
           <button
             key={app.id}
@@ -30,11 +24,6 @@ export function AppLauncher({ apps, onAppOpen }: AppLauncherProps) {
             </span>
           </button>
         ))}
-      </div>
-
-      {/* Footer */}
-      <div className="text-center mt-12 text-gray-500 text-sm">
-        <p>More apps coming soon!</p>
       </div>
     </div>
   )
