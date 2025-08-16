@@ -26,8 +26,6 @@ export function Runner() {
 
   const PLAYER_WIDTH = 30
   const PLAYER_HEIGHT = 30
-  const CANVAS_WIDTH = window.innerWidth
-  const CANVAS_HEIGHT = window.innerHeight
   const PLAYER_MOVE_SPEED = 5
 
   // Initialize game
@@ -39,13 +37,25 @@ export function Runner() {
     if (!canvas || !ctx) return
 
     // Set canvas to full screen
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+    }
+
+    resizeCanvas()
+    window.addEventListener('resize', resizeCanvas)
+    return () => window.removeEventListener('resize', resizeCanvas)
   }, [])
 
   // Game loop
   const gameLoop = useCallback(() => {
     if (gameState !== 'playing') return
+
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const CANVAS_WIDTH = canvas.width
+    const CANVAS_HEIGHT = canvas.height
 
     setScore(prev => prev + 1)
     setObstacleSpawnRate(prev => prev + 1)
@@ -104,7 +114,7 @@ export function Runner() {
     }
 
     gameLoopRef.current = requestAnimationFrame(gameLoop)
-  }, [gameState, score, obstacles, playerX, gameSpeed, obstacleSpawnRate, keysPressed, CANVAS_WIDTH, CANVAS_HEIGHT])
+  }, [gameState, score, obstacles, playerX, gameSpeed, obstacleSpawnRate, keysPressed])
 
   // Handle player movement
   useEffect(() => {
@@ -147,6 +157,7 @@ export function Runner() {
 
     const rect = canvas.getBoundingClientRect()
     const touchX = touch.clientX - rect.left
+    const CANVAS_WIDTH = canvas.width
 
     if (touchX < CANVAS_WIDTH / 2) {
       setPlayerX(prev => Math.max(0, prev - 20))
@@ -156,9 +167,12 @@ export function Runner() {
   }
 
   const startGame = () => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
     setGameState('playing')
     setScore(0)
-    setPlayerX(CANVAS_WIDTH / 2 - PLAYER_WIDTH / 2)
+    setPlayerX(canvas.width / 2 - PLAYER_WIDTH / 2)
     setObstacles([])
     setGameSpeed(3)
     setObstacleSpawnRate(0)
@@ -189,7 +203,7 @@ export function Runner() {
   const quitGame = () => {
     setGameState('instructions')
     setScore(0)
-    setPlayerX(CANVAS_WIDTH / 2 - PLAYER_WIDTH / 2)
+    setPlayerX(200)
     setObstacles([])
     setGameSpeed(3)
     setObstacleSpawnRate(0)
@@ -215,6 +229,9 @@ export function Runner() {
 
     const ctx = canvas.getContext('2d')
     if (!ctx) return
+
+    const CANVAS_WIDTH = canvas.width
+    const CANVAS_HEIGHT = canvas.height
 
     // Clear canvas
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
@@ -242,7 +259,7 @@ export function Runner() {
     ctx.font = '20px Arial'
     ctx.fillText(`Score: ${score}`, 10, 30)
     ctx.fillText(`High Score: ${highScore}`, 10, 60)
-  }, [playerX, obstacles, score, highScore, CANVAS_WIDTH, CANVAS_HEIGHT])
+  }, [playerX, obstacles, score, highScore])
 
   const renderInstructions = () => (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">

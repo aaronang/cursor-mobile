@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { RotateCcw, Palette, Minus, Plus } from "lucide-react"
+import { RotateCcw, Palette, Minus, Plus, Settings } from "lucide-react"
 
 export function Paint() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -7,6 +7,7 @@ export function Paint() {
   const [currentColor, setCurrentColor] = useState('#000000')
   const [brushSize, setBrushSize] = useState(5)
   const [isErasing, setIsErasing] = useState(false)
+  const [showTools, setShowTools] = useState(false)
 
   const colors = [
     '#000000', '#FFFFFF', '#FF0000', '#00FF00', '#0000FF',
@@ -21,16 +22,22 @@ export function Paint() {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // Set canvas size
-    canvas.width = canvas.offsetWidth
-    canvas.height = canvas.offsetHeight
+    // Set canvas size to fit the available space
+    const resizeCanvas = () => {
+      const container = canvas.parentElement
+      if (container) {
+        const rect = container.getBoundingClientRect()
+        canvas.width = rect.width
+        canvas.height = rect.height
+      }
+    }
 
-    // Set initial background
-    ctx.fillStyle = '#FFFFFF'
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    resizeCanvas()
+    window.addEventListener('resize', resizeCanvas)
+    return () => window.removeEventListener('resize', resizeCanvas)
   }, [])
 
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     setIsDrawing(true)
     draw(e)
   }
@@ -39,7 +46,7 @@ export function Paint() {
     setIsDrawing(false)
   }
 
-  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     if (!isDrawing) return
 
     const canvas = canvasRef.current
@@ -48,9 +55,22 @@ export function Paint() {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
+    let clientX: number, clientY: number
+
+    if ('touches' in e) {
+      // Touch event
+      const touch = e.touches[0]
+      clientX = touch.clientX
+      clientY = touch.clientY
+    } else {
+      // Mouse event
+      clientX = e.clientX
+      clientY = e.clientY
+    }
+
     const rect = canvas.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
+    const x = clientX - rect.left
+    const y = clientY - rect.top
 
     ctx.lineWidth = brushSize
     ctx.lineCap = 'round'
@@ -77,114 +97,124 @@ export function Paint() {
     setIsErasing(!isErasing)
   }
 
+  const toggleTools = () => {
+    setShowTools(!showTools)
+  }
+
   return (
-    <div className="min-h-screen bg-stone-50 p-4">
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-stone-800 mb-2">Paint</h2>
-          <p className="text-stone-600">Draw and create on your canvas</p>
+    <div className="fixed inset-0 bg-white flex flex-col">
+      {/* Top Toolbar */}
+      <div className="bg-stone-900 text-white p-4 flex items-center justify-between">
+        <h1 className="text-xl font-bold">Paint</h1>
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={toggleTools}
+            className="p-2 rounded-lg hover:bg-stone-800 transition-colors"
+          >
+            <Settings className="w-5 h-5" />
+          </button>
+          <button
+            onClick={clearCanvas}
+            className="px-3 py-2 bg-stone-700 rounded-lg hover:bg-stone-600 transition-colors flex items-center gap-2"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Clear
+          </button>
         </div>
+      </div>
 
-        {/* Tools */}
-        <div className="bg-white rounded-2xl p-4 mb-4 shadow-sm border border-stone-200">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-stone-800">Tools</h3>
-            <button
-              onClick={clearCanvas}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-stone-900 text-stone-50 font-medium rounded-lg hover:bg-stone-800 active:bg-stone-700 transition-colors shadow-sm"
-            >
-              <RotateCcw className="w-4 h-4" />
-              Clear
-            </button>
-          </div>
-
-          {/* Color Palette */}
-          <div className="mb-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Palette className="w-4 h-4 text-stone-600" />
-              <span className="text-sm font-medium text-stone-700">Colors</span>
-            </div>
-            <div className="grid grid-cols-15 gap-2">
-              {colors.map((color) => (
-                <button
-                  key={color}
-                  onClick={() => {
-                    setCurrentColor(color)
-                    setIsErasing(false)
-                  }}
-                  className={`w-8 h-8 rounded-lg border-2 transition-all ${
-                    currentColor === color && !isErasing
-                      ? 'border-stone-900 ring-2 ring-stone-400'
-                      : 'border-stone-200 hover:border-stone-400'
-                  }`}
-                  style={{ backgroundColor: color }}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Brush Size */}
-          <div className="mb-4">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm font-medium text-stone-700">Brush Size</span>
-              <span className="text-sm text-stone-500">{brushSize}px</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setBrushSize(Math.max(1, brushSize - 1))}
-                className="w-8 h-8 bg-stone-200 rounded-lg flex items-center justify-center hover:bg-stone-300 transition-colors"
-              >
-                <Minus className="w-4 h-4 text-stone-600" />
-              </button>
-              <div className="w-32 h-2 bg-stone-200 rounded-full">
-                <div 
-                  className="h-full bg-stone-900 rounded-full transition-all"
-                  style={{ width: `${(brushSize / 20) * 100}%` }}
-                />
+      {/* Tools Panel - Slides down when active */}
+      {showTools && (
+        <div className="bg-stone-100 border-b border-stone-200 p-4">
+          <div className="max-w-md mx-auto space-y-4">
+            {/* Color Palette */}
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Palette className="w-4 h-4 text-stone-600" />
+                <span className="text-sm font-medium text-stone-700">Colors</span>
               </div>
+              <div className="grid grid-cols-15 gap-2">
+                {colors.map((color) => (
+                  <button
+                    key={color}
+                    onClick={() => {
+                      setCurrentColor(color)
+                      setIsErasing(false)
+                    }}
+                    className={`w-8 h-8 rounded-lg border-2 transition-all ${
+                      currentColor === color && !isErasing
+                        ? 'border-stone-900 ring-2 ring-stone-400'
+                        : 'border-stone-200 hover:border-stone-400'
+                    }`}
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Brush Size */}
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-sm font-medium text-stone-700">Brush Size</span>
+                <span className="text-sm text-stone-500">{brushSize}px</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setBrushSize(Math.max(1, brushSize - 1))}
+                  className="w-8 h-8 bg-stone-200 rounded-lg flex items-center justify-center hover:bg-stone-300 transition-colors"
+                >
+                  <Minus className="w-4 h-4 text-stone-600" />
+                </button>
+                <div className="w-32 h-2 bg-stone-200 rounded-full">
+                  <div 
+                    className="h-full bg-stone-900 rounded-full transition-all"
+                    style={{ width: `${(brushSize / 20) * 100}%` }}
+                  />
+                </div>
+                <button
+                  onClick={() => setBrushSize(Math.min(20, brushSize + 1))}
+                  className="w-8 h-8 bg-stone-200 rounded-lg flex items-center justify-center hover:bg-stone-300 transition-colors"
+                >
+                  <Plus className="w-4 h-4 text-stone-600" />
+                </button>
+              </div>
+            </div>
+
+            {/* Eraser Toggle */}
+            <div>
               <button
-                onClick={() => setBrushSize(Math.min(20, brushSize + 1))}
-                className="w-8 h-8 bg-stone-200 rounded-lg flex items-center justify-center hover:bg-stone-300 transition-colors"
+                onClick={toggleEraser}
+                className={`px-4 py-2 rounded-lg border-2 transition-all ${
+                  isErasing
+                    ? 'bg-stone-900 text-stone-50 border-stone-900'
+                    : 'bg-white text-stone-700 border-stone-200 hover:border-stone-400'
+                }`}
               >
-                <Plus className="w-4 h-4 text-stone-600" />
+                {isErasing ? 'Drawing Mode' : 'Eraser Mode'}
               </button>
             </div>
           </div>
-
-          {/* Eraser Toggle */}
-          <div>
-            <button
-              onClick={toggleEraser}
-              className={`px-4 py-2 rounded-lg border-2 transition-all ${
-                isErasing
-                  ? 'bg-stone-900 text-stone-50 border-stone-900'
-                  : 'bg-white text-stone-700 border-stone-200 hover:border-stone-400'
-              }`}
-            >
-              {isErasing ? 'Drawing Mode' : 'Eraser Mode'}
-            </button>
-          </div>
         </div>
+      )}
 
-        {/* Canvas */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-stone-200">
-          <canvas
-            ref={canvasRef}
-            onMouseDown={startDrawing}
-            onMouseUp={stopDrawing}
-            onMouseLeave={stopDrawing}
-            onMouseMove={draw}
-            className="w-full h-96 border border-stone-200 rounded-lg cursor-crosshair"
-          />
-        </div>
+      {/* Canvas - Takes remaining space */}
+      <div className="flex-1 relative">
+        <canvas
+          ref={canvasRef}
+          onMouseDown={startDrawing}
+          onMouseUp={stopDrawing}
+          onMouseLeave={stopDrawing}
+          onMouseMove={draw}
+          onTouchStart={startDrawing}
+          onTouchEnd={stopDrawing}
+          onTouchMove={draw}
+          className="w-full h-full cursor-crosshair touch-none"
+        />
+      </div>
 
-        {/* Instructions */}
-        <div className="mt-6 text-center text-stone-600 text-sm">
-          <p>• Click and drag to draw</p>
-          <p>• Use the eraser to remove drawings</p>
-          <p>• Adjust brush size and colors</p>
-        </div>
+      {/* Bottom Status Bar */}
+      <div className="bg-stone-100 border-t border-stone-200 p-2 text-center text-sm text-stone-600">
+        {isErasing ? 'Eraser Mode' : `Drawing with ${currentColor} - Size: ${brushSize}px`}
       </div>
     </div>
   )
