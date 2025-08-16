@@ -34,24 +34,34 @@ export function AppLauncher({ apps, onAppOpen, currentWallpaper, currentLayout }
     </div>
   )
 
-  const renderListLayout = () => (
-    <div className="max-w-sm mx-auto pt-12 space-y-3">
-      {apps.map((app) => (
-        <button
-          key={app.id}
-          onClick={() => onAppOpen(app.id)}
-          className="w-full flex items-center space-x-4 p-4 bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm hover:shadow-md transition-all border border-white/30 hover:bg-white/90"
-        >
-          <div className="w-12 h-12 bg-stone-900 rounded-xl flex items-center justify-center shadow-sm border border-stone-50/15">
-            {app.icon}
+  const renderListLayout = () => {
+    // Sort apps alphabetically by name
+    const sortedApps = [...apps].sort((a, b) => a.name.localeCompare(b.name))
+    
+    return (
+      <div className="max-w-sm mx-auto pt-12 space-y-0">
+        {sortedApps.map((app, index) => (
+          <div key={app.id}>
+            <button
+              onClick={() => onAppOpen(app.id)}
+              className="w-full flex items-center space-x-4 p-4 bg-white/80 backdrop-blur-sm hover:bg-white/90 transition-all"
+            >
+              <div className="w-12 h-12 bg-stone-900 rounded-xl flex items-center justify-center shadow-sm border border-stone-50/15">
+                {app.icon}
+              </div>
+              <span className={`text-sm font-medium transition-colors ${getLabelColor(currentWallpaper.id)}`}>
+                {app.name}
+              </span>
+            </button>
+            {/* Border separator between apps */}
+            {index < sortedApps.length - 1 && (
+              <div className="border-b border-stone-200/50 mx-4"></div>
+            )}
           </div>
-          <span className={`text-sm font-medium transition-colors ${getLabelColor(currentWallpaper.id)}`}>
-            {app.name}
-          </span>
-        </button>
-      ))}
-    </div>
-  )
+        ))}
+      </div>
+    )
+  }
 
   return (
     <div className={`min-h-screen p-4 ${currentWallpaper.className}`}>
