@@ -70,21 +70,21 @@ export function TicTacToe() {
         key={index}
         onClick={() => handleSquareClick(index)}
         disabled={value !== null || winner !== null || gameOver}
-        className="w-20 h-20 bg-white border-2 border-gray-300 rounded-lg flex items-center justify-center text-3xl font-bold transition-all duration-200 hover:bg-gray-50 active:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-100"
+        className="w-20 h-20 bg-white border-2 border-stone-300 rounded-lg flex items-center justify-center text-3xl font-bold transition-all duration-200 hover:bg-stone-50 active:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-100"
       >
-        {value === "X" && <X className="w-10 h-10 text-blue-600" />}
-        {value === "O" && <Circle className="w-10 h-10 text-red-600" />}
+        {value === "X" && <X className="w-10 h-10 text-stone-800" />}
+        {value === "O" && <Circle className="w-10 h-10 text-stone-600" />}
       </button>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen bg-stone-50 p-4">
       <div className="max-w-sm mx-auto">
         {/* Game Header */}
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Tic Tac Toe</h2>
-          <p className="text-lg text-gray-600 font-medium">{getStatusMessage()}</p>
+          <h2 className="text-2xl font-bold text-stone-800 mb-2">Tic Tac Toe</h2>
+          <p className="text-lg text-stone-600 font-medium">{getStatusMessage()}</p>
         </div>
 
         {/* Game Board */}
@@ -96,7 +96,7 @@ export function TicTacToe() {
         <div className="text-center">
           <button
             onClick={resetGame}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-lg hover:shadow-xl"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-stone-900 text-stone-50 font-medium rounded-lg hover:bg-stone-800 active:bg-stone-700 transition-colors shadow-sm"
           >
             <RotateCcw className="w-5 h-5" />
             New Game
@@ -104,7 +104,7 @@ export function TicTacToe() {
         </div>
 
         {/* Game Instructions */}
-        <div className="mt-8 text-center text-gray-600 text-sm">
+        <div className="mt-8 text-center text-stone-600 text-sm">
           <p className="mb-2">How to play:</p>
           <p>• Tap any empty square to place your mark</p>
           <p>• Get three in a row to win!</p>
