@@ -14,7 +14,7 @@ export function AppLauncher({ apps, onAppOpen }: AppLauncherProps) {
           <button
             key={app.id}
             onClick={() => onAppOpen(app.id)}
-            className="group flex flex-col items-center space-y-3 p-4 rounded-2xl bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95"
+            className="group flex flex-col items-center space-y-3"
           >
             <div className={`w-16 h-16 ${app.color} rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:shadow-xl transition-shadow`}>
               {app.icon}
