@@ -44,7 +44,7 @@ export function AppLauncher({ apps, onAppOpen, currentWallpaper, currentLayout }
           <div key={app.id}>
             <button
               onClick={() => onAppOpen(app.id)}
-              className="w-full flex items-center space-x-4 p-4 bg-white/80 backdrop-blur-sm hover:bg-white/90 transition-all"
+              className="w-full flex items-center space-x-4 p-4 hover:bg-white/10 transition-all"
             >
               <div className="w-12 h-12 bg-stone-900 rounded-xl flex items-center justify-center shadow-sm border border-stone-50/15">
                 {app.icon}
