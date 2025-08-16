@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { AppLauncher } from "./components/AppLauncher"
 import { TicTacToe } from "./components/TicTacToe"
 import { Sudoku } from "./components/Sudoku"
+import type { Wallpaper } from "./components/WallpaperPicker"
 import { X, Grid3X3 } from "lucide-react"
 
 export type App = {
@@ -14,6 +15,12 @@ export type App = {
 
 function App() {
   const [currentApp, setCurrentApp] = useState<string | null>(null)
+  const [currentWallpaper, setCurrentWallpaper] = useState<Wallpaper>({
+    id: "stone-50",
+    name: "Light Stone",
+    className: "bg-stone-50",
+    preview: "bg-stone-50"
+  })
 
   const apps: App[] = [
     {
@@ -65,6 +72,10 @@ function App() {
     window.history.pushState({ app: appId }, '', newUrl)
   }
 
+  const handleWallpaperChange = (wallpaper: Wallpaper) => {
+    setCurrentWallpaper(wallpaper)
+  }
+
   if (currentApp) {
     const app = apps.find(a => a.id === currentApp)
     if (app) {
@@ -79,7 +90,12 @@ function App() {
 
   return (
     <div className="min-h-screen">
-      <AppLauncher apps={apps} onAppOpen={handleAppOpen} />
+      <AppLauncher 
+        apps={apps} 
+        onAppOpen={handleAppOpen}
+        currentWallpaper={currentWallpaper}
+        onWallpaperChange={handleWallpaperChange}
+      />
     </div>
   )
 }

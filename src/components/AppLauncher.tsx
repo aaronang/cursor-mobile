@@ -1,13 +1,31 @@
 import type { App } from "../App"
+import type { Wallpaper } from "./WallpaperPicker"
+import { Palette } from "lucide-react"
+import { useState } from "react"
+import { WallpaperPicker } from "./WallpaperPicker"
 
 interface AppLauncherProps {
   apps: App[]
   onAppOpen: (appId: string) => void
+  currentWallpaper: Wallpaper
+  onWallpaperChange: (wallpaper: Wallpaper) => void
 }
 
-export function AppLauncher({ apps, onAppOpen }: AppLauncherProps) {
+export function AppLauncher({ apps, onAppOpen, currentWallpaper, onWallpaperChange }: AppLauncherProps) {
+  const [isWallpaperPickerOpen, setIsWallpaperPickerOpen] = useState(false)
+
   return (
-    <div className="min-h-screen p-4 bg-stone-50">
+    <div className={`min-h-screen p-4 ${currentWallpaper.className}`}>
+      {/* Wallpaper Button */}
+      <div className="absolute top-4 right-4">
+        <button
+          onClick={() => setIsWallpaperPickerOpen(true)}
+          className="p-3 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-all shadow-sm"
+        >
+          <Palette className="w-5 h-5 text-stone-800" />
+        </button>
+      </div>
+
       {/* App Grid */}
       <div className="grid grid-cols-3 gap-6 max-w-sm mx-auto pt-12">
         {apps.map((app) => (
@@ -25,6 +43,14 @@ export function AppLauncher({ apps, onAppOpen }: AppLauncherProps) {
           </button>
         ))}
       </div>
+
+      {/* Wallpaper Picker */}
+      <WallpaperPicker
+        isOpen={isWallpaperPickerOpen}
+        onClose={() => setIsWallpaperPickerOpen(false)}
+        onWallpaperChange={onWallpaperChange}
+        currentWallpaper={currentWallpaper}
+      />
     </div>
   )
 }
