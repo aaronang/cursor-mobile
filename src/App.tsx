@@ -3,8 +3,10 @@ import { AppLauncher } from "./components/AppLauncher"
 import { TicTacToe } from "./components/TicTacToe"
 import { Sudoku } from "./components/Sudoku"
 import { Settings } from "./components/Settings"
+import { Paint } from "./components/Paint"
+import { Runner } from "./components/Runner"
 import type { Wallpaper } from "./components/WallpaperPicker"
-import { X, Grid3X3, Settings as SettingsIcon } from "lucide-react"
+import { X, Grid3X3, Settings as SettingsIcon, Palette, Play } from "lucide-react"
 
 export type App = {
   id: string
@@ -38,6 +40,20 @@ function App() {
       icon: <Grid3X3 className="w-8 h-8 text-stone-50" />,
       color: "bg-blue-500",
       component: Sudoku
+    },
+    {
+      id: "paint",
+      name: "Paint",
+      icon: <Palette className="w-8 h-8 text-stone-50" />,
+      color: "bg-blue-500",
+      component: Paint
+    },
+    {
+      id: "runner",
+      name: "Runner",
+      icon: <Play className="w-8 h-8 text-stone-50" />,
+      color: "bg-blue-500",
+      component: Runner
     },
     {
       id: "settings",
