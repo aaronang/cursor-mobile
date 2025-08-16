@@ -134,7 +134,6 @@ export function Sudoku() {
 
   const renderCell = (cell: Cell, row: number, col: number) => {
     const isSelected = selectedCell && selectedCell[0] === row && selectedCell[1] === col
-    const isBoxBorder = (row + 1) % 3 === 0 || (col + 1) % 3 === 0
 
     return (
       <button
@@ -149,9 +148,10 @@ export function Sudoku() {
           }
           ${isSelected ? 'bg-stone-300 border-stone-400' : ''}
           ${cell.hasError ? 'bg-red-100 border-red-300 text-red-800' : ''}
-          ${isBoxBorder ? 'border-r-2 border-b-2' : 'border-r border-b'}
-          ${row === 0 ? 'border-t-2' : ''}
-          ${col === 0 ? 'border-l-2' : ''}
+          ${(row + 1) % 3 === 0 ? 'border-b-4 border-b-stone-400' : 'border-b border-b-stone-200'}
+          ${(col + 1) % 3 === 0 ? 'border-r-4 border-r-stone-400' : 'border-r border-r-stone-200'}
+          ${row === 0 ? 'border-t-4 border-t-stone-400' : ''}
+          ${col === 0 ? 'border-l-4 border-l-stone-400' : ''}
           transition-colors
         `}
       >
