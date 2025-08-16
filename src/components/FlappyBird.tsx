@@ -144,16 +144,24 @@ const FlappyBird = () => {
       }
     }
 
-    const handleTouchStart = () => {
+    const handleTouchStart = (e: TouchEvent) => {
+      e.preventDefault()
+      flap()
+    }
+
+    const handleMouseDown = (e: MouseEvent) => {
+      e.preventDefault()
       flap()
     }
 
     window.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('touchstart', handleTouchStart)
+    window.addEventListener('touchstart', handleTouchStart, { passive: false })
+    window.addEventListener('mousedown', handleMouseDown)
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('touchstart', handleTouchStart)
+      window.removeEventListener('mousedown', handleMouseDown)
     }
   }, [])
 
@@ -170,13 +178,11 @@ const FlappyBird = () => {
     ctx.fillRect(0, 0, canvas.width, canvas.height)
 
     if (gameState === 'playing') {
-      // Draw bird
-      ctx.fillStyle = '#78716c' // stone-500
-      ctx.fillRect(200, bird.y, BIRD_SIZE, BIRD_SIZE)
-      
-      // Bird eye
-      ctx.fillStyle = '#44403c' // stone-700
-      ctx.fillRect(210, bird.y + 5, 4, 4)
+      // Draw bird emoji
+      ctx.font = '24px Arial'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText('🐦', 200 + BIRD_SIZE/2, bird.y + BIRD_SIZE/2)
 
       // Draw pipes
       ctx.fillStyle = '#78716c' // stone-500
