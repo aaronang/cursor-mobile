@@ -58,8 +58,11 @@ function App() {
 
   const handleAppOpen = (appId: string) => {
     setCurrentApp(appId)
-    // Update URL without adding to history (replace current entry)
-    window.history.pushState({ app: appId }, '', `/${appId}`)
+    // Update URL while preserving the base URL
+    const currentUrl = window.location.href
+    const baseUrl = currentUrl.split('/').slice(0, -1).join('/')
+    const newUrl = `${baseUrl}/${appId}`
+    window.history.pushState({ app: appId }, '', newUrl)
   }
 
   if (currentApp) {
