@@ -2,8 +2,9 @@ import { useState, useEffect } from "react"
 import { AppLauncher } from "./components/AppLauncher"
 import { TicTacToe } from "./components/TicTacToe"
 import { Sudoku } from "./components/Sudoku"
+import { Settings } from "./components/Settings"
 import type { Wallpaper } from "./components/WallpaperPicker"
-import { X, Grid3X3 } from "lucide-react"
+import { X, Grid3X3, Settings as SettingsIcon } from "lucide-react"
 
 export type App = {
   id: string
@@ -36,6 +37,13 @@ function App() {
       icon: <Grid3X3 className="w-8 h-8 text-stone-50" />,
       color: "bg-blue-500",
       component: Sudoku
+    },
+    {
+      id: "settings",
+      name: "Settings",
+      icon: <SettingsIcon className="w-8 h-8 text-stone-50" />,
+      color: "bg-blue-500",
+      component: () => <Settings currentWallpaper={currentWallpaper} onWallpaperChange={setCurrentWallpaper} />
     }
   ]
 
@@ -72,10 +80,6 @@ function App() {
     window.history.pushState({ app: appId }, '', newUrl)
   }
 
-  const handleWallpaperChange = (wallpaper: Wallpaper) => {
-    setCurrentWallpaper(wallpaper)
-  }
-
   if (currentApp) {
     const app = apps.find(a => a.id === currentApp)
     if (app) {
@@ -94,7 +98,6 @@ function App() {
         apps={apps} 
         onAppOpen={handleAppOpen}
         currentWallpaper={currentWallpaper}
-        onWallpaperChange={handleWallpaperChange}
       />
     </div>
   )
