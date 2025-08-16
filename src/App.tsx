@@ -1,4 +1,4 @@
-import { useState, useRef } from "react"
+import { useState, useEffect } from "react"
 import { AppLauncher } from "./components/AppLauncher"
 import { TicTacToe } from "./components/TicTacToe"
 import { Sudoku } from "./components/Sudoku"
@@ -14,9 +14,6 @@ export type App = {
 
 function App() {
   const [currentApp, setCurrentApp] = useState<string | null>(null)
-  const [isSwiping, setIsSwiping] = useState(false)
-  const [swipeStart, setSwipeStart] = useState<number | null>(null)
-  const appContainerRef = useRef<HTMLDivElement>(null)
 
   const apps: App[] = [
     {
@@ -35,45 +32,34 @@ function App() {
     }
   ]
 
+  // Handle browser back/forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname
+      const appId = path.substring(1) // Remove leading slash
+      
+      if (appId && apps.find(a => a.id === appId)) {
+        setCurrentApp(appId)
+      } else {
+        setCurrentApp(null)
+      }
+    }
+
+    // Check initial URL on load
+    const path = window.location.pathname
+    const appId = path.substring(1)
+    if (appId && apps.find(a => a.id === appId)) {
+      setCurrentApp(appId)
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [apps])
+
   const handleAppOpen = (appId: string) => {
     setCurrentApp(appId)
-  }
-
-  const handleAppClose = () => {
-    setCurrentApp(null)
-  }
-
-  // Touch event handlers for swipe-to-go-back
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setSwipeStart(e.touches[0].clientX)
-    setIsSwiping(false)
-  }
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (swipeStart === null) return
-    
-    const currentX = e.touches[0].clientX
-    const diff = currentX - swipeStart
-    
-    // If swiping right (back gesture), show visual feedback
-    if (diff > 50) {
-      setIsSwiping(true)
-    }
-  }
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (swipeStart === null) return
-    
-    const currentX = e.changedTouches[0].clientX
-    const diff = currentX - swipeStart
-    
-    // If swiped right more than 100px, go back
-    if (diff > 100) {
-      handleAppClose()
-    }
-    
-    setSwipeStart(null)
-    setIsSwiping(false)
+    // Update URL without adding to history (replace current entry)
+    window.history.pushState({ app: appId }, '', `/${appId}`)
   }
 
   if (currentApp) {
@@ -81,15 +67,7 @@ function App() {
     if (app) {
       const AppComponent = app.component
       return (
-        <div 
-          ref={appContainerRef}
-          className={`fixed inset-0 z-50 bg-white transition-transform duration-300 ${
-            isSwiping ? 'translate-x-8' : 'translate-x-0'
-          }`}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
+        <div className="fixed inset-0 z-50 bg-white">
           <AppComponent />
         </div>
       )
