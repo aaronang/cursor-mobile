@@ -118,3 +118,38 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Mobile-specific styles */
+@layer utilities {
+  /* Prevent zoom on input focus on iOS */
+  input, textarea, select {
+    font-size: 16px;
+  }
+  
+  /* Touch-friendly button sizes */
+  button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Smooth scrolling for mobile */
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent text selection on buttons */
+  button {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Active state for touch devices */
+  @media (hover: none) and (pointer: coarse) {
+    button:active {
+      transform: scale(0.95);
+    }
+  }
+}

@@ -1,69 +1,104 @@
-# React + TypeScript + Vite
+# App Launcher
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A mobile-friendly app launcher built with React, TypeScript, and Tailwind CSS. Similar to iOS and Android home screens, this launcher provides a clean interface for organizing and launching apps.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Mobile-First Design**: Optimized for touch devices with responsive layout
+- **App Grid**: Clean, organized grid layout for app icons
+- **Tic Tac Toe Game**: Built-in game as the first app
+- **Touch-Friendly**: Proper touch interactions and mobile optimizations
+- **Modern UI**: Beautiful design with smooth animations and transitions
 
-## Expanding the ESLint configuration
+## Apps Included
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Tic Tac Toe
+- Classic 3x3 grid game
+- Two-player gameplay (X and O)
+- Win detection and draw handling
+- Reset functionality
+- Mobile-optimized touch controls
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### Prerequisites
+- Node.js (version 16 or higher)
+- npm or yarn
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Installation
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+### Development
+Start the development server:
+```bash
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The app will be available at `http://localhost:5173`
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Building for Production
+Build the app for production:
+```bash
+npm run build
 ```
+
+### Preview Production Build
+Preview the production build:
+```bash
+npm run preview
+```
+
+## Mobile Features
+
+- **Touch Optimized**: All buttons and interactions are designed for touch devices
+- **Responsive Design**: Adapts to different screen sizes
+- **Mobile Meta Tags**: Proper viewport and PWA meta tags
+- **Touch-Friendly Sizing**: Minimum 44px touch targets
+- **Smooth Animations**: Optimized for mobile performance
+
+## Adding New Apps
+
+To add new apps to the launcher:
+
+1. Create a new component in `src/components/`
+2. Add the app to the `apps` array in `src/App.tsx`
+3. Include:
+   - `id`: Unique identifier
+   - `name`: Display name
+   - `icon`: React component for the icon
+   - `color`: Tailwind CSS color class
+   - `component`: The React component to render
+
+Example:
+```typescript
+{
+  id: "calculator",
+  name: "Calculator",
+  icon: <Calculator className="w-8 h-8" />,
+  color: "bg-green-500",
+  component: Calculator
+}
+```
+
+## Technology Stack
+
+- **React 19**: Latest React with modern features
+- **TypeScript**: Type-safe development
+- **Tailwind CSS**: Utility-first CSS framework
+- **Vite**: Fast build tool and dev server
+- **Lucide React**: Beautiful icon library
+- **shadcn/ui**: High-quality UI components
+
+## Browser Support
+
+- Modern browsers with ES6+ support
+- Mobile browsers (iOS Safari, Chrome Mobile, etc.)
+- Touch-enabled devices recommended
+
+## License
+
+This project is open source and available under the MIT License.
