@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react"
-import { Play, RotateCcw, X } from "lucide-react"
+import { Play, RotateCcw } from "lucide-react"
 
 type GameObject = {
   x: number
@@ -200,16 +200,6 @@ export function Runner() {
     }
   }
 
-  const quitGame = () => {
-    setGameState('instructions')
-    setScore(0)
-    setPlayerX(200)
-    setObstacles([])
-    setGameSpeed(3)
-    setObstacleSpawnRate(0)
-    setKeysPressed(new Set())
-  }
-
   // Start game loop when playing
   useEffect(() => {
     if (gameState === 'playing') {
@@ -296,20 +286,13 @@ export function Runner() {
         {score > highScore && (
           <p className="text-green-600 font-medium mb-4">New High Score! 🎉</p>
         )}
-        <div className="space-y-3">
+        <div>
           <button
             onClick={startGame}
-            className="block w-full px-8 py-3 bg-stone-900 text-stone-50 text-lg font-medium rounded-lg hover:bg-stone-800 active:bg-stone-700 transition-colors shadow-lg"
+            className="w-full px-8 py-3 bg-stone-900 text-stone-50 text-lg font-medium rounded-lg hover:bg-stone-800 active:bg-stone-700 transition-colors shadow-lg"
           >
             <RotateCcw className="w-5 h-5 inline mr-2" />
             Play Again
-          </button>
-          <button
-            onClick={quitGame}
-            className="block w-full px-8 py-3 bg-stone-200 text-stone-800 text-lg font-medium rounded-lg hover:bg-stone-300 transition-colors"
-          >
-            <X className="w-5 h-5 inline mr-2" />
-            Quit
           </button>
         </div>
       </div>
