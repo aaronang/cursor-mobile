@@ -2,11 +2,12 @@ import { useState, useEffect } from "react"
 import { AppLauncher } from "./components/AppLauncher"
 import { TicTacToe } from "./components/TicTacToe"
 import { Sudoku } from "./components/Sudoku"
-import { Settings } from "./components/Settings"
 import { Paint } from "./components/Paint"
 import { Runner } from "./components/Runner"
+import { Settings } from "./components/Settings"
+import FlappyBird from "./components/FlappyBird"
 import type { Wallpaper } from "./components/WallpaperPicker"
-import { X, Grid3X3, Settings as SettingsIcon, Palette, Play } from "lucide-react"
+import { X, Grid3X3, Settings as SettingsIcon, Palette, Play, Bird } from "lucide-react"
 
 export type App = {
   id: string
@@ -31,29 +32,36 @@ function App() {
       id: "tictactoe",
       name: "Tic Tac Toe",
       icon: <X className="w-8 h-8 text-stone-50" />,
-      color: "bg-blue-500",
+      color: "bg-stone-900",
       component: TicTacToe
     },
     {
       id: "sudoku",
       name: "Sudoku",
       icon: <Grid3X3 className="w-8 h-8 text-stone-50" />,
-      color: "bg-blue-500",
+      color: "bg-stone-900",
       component: Sudoku
     },
     {
       id: "paint",
       name: "Paint",
       icon: <Palette className="w-8 h-8 text-stone-50" />,
-      color: "bg-blue-500",
+      color: "bg-stone-900",
       component: Paint
     },
     {
       id: "runner",
       name: "Runner",
       icon: <Play className="w-8 h-8 text-stone-50" />,
-      color: "bg-blue-500",
+      color: "bg-stone-900",
       component: Runner
+    },
+    {
+      id: "flappybird",
+      name: "Flappy Bird",
+      icon: <Bird className="w-8 h-8 text-stone-50" />,
+      color: "bg-stone-900",
+      component: FlappyBird
     },
     {
       id: "settings",
