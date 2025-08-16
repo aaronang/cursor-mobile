@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { AppLauncher } from "./components/AppLauncher"
 import { TicTacToe } from "./components/TicTacToe"
 import { Sudoku } from "./components/Sudoku"
@@ -14,6 +14,9 @@ export type App = {
 
 function App() {
   const [currentApp, setCurrentApp] = useState<string | null>(null)
+  const [isSwiping, setIsSwiping] = useState(false)
+  const [swipeStart, setSwipeStart] = useState<number | null>(null)
+  const appContainerRef = useRef<HTMLDivElement>(null)
 
   const apps: App[] = [
     {
@@ -40,24 +43,54 @@ function App() {
     setCurrentApp(null)
   }
 
+  // Touch event handlers for swipe-to-go-back
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setSwipeStart(e.touches[0].clientX)
+    setIsSwiping(false)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (swipeStart === null) return
+    
+    const currentX = e.touches[0].clientX
+    const diff = currentX - swipeStart
+    
+    // If swiping right (back gesture), show visual feedback
+    if (diff > 50) {
+      setIsSwiping(true)
+    }
+  }
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (swipeStart === null) return
+    
+    const currentX = e.changedTouches[0].clientX
+    const diff = currentX - swipeStart
+    
+    // If swiped right more than 100px, go back
+    if (diff > 100) {
+      handleAppClose()
+    }
+    
+    setSwipeStart(null)
+    setIsSwiping(false)
+  }
+
   if (currentApp) {
     const app = apps.find(a => a.id === currentApp)
     if (app) {
       const AppComponent = app.component
       return (
-        <div className="fixed inset-0 z-50 bg-white">
-          <div className="flex items-center justify-between p-4 border-b">
-            <h1 className="text-lg font-semibold">{app.name}</h1>
-            <button
-              onClick={handleAppClose}
-              className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="flex-1 overflow-auto">
-            <AppComponent />
-          </div>
+        <div 
+          ref={appContainerRef}
+          className={`fixed inset-0 z-50 bg-white transition-transform duration-300 ${
+            isSwiping ? 'translate-x-8' : 'translate-x-0'
+          }`}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <AppComponent />
         </div>
       )
     }
