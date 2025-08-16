@@ -22,6 +22,7 @@ function App() {
     className: "bg-stone-50",
     preview: "bg-stone-50"
   })
+  const [currentLayout, setCurrentLayout] = useState<'grid' | 'list'>('grid')
 
   const apps: App[] = [
     {
@@ -43,7 +44,12 @@ function App() {
       name: "Settings",
       icon: <SettingsIcon className="w-8 h-8 text-stone-50" />,
       color: "bg-blue-500",
-      component: () => <Settings currentWallpaper={currentWallpaper} onWallpaperChange={setCurrentWallpaper} />
+      component: () => <Settings 
+        currentWallpaper={currentWallpaper} 
+        onWallpaperChange={setCurrentWallpaper}
+        currentLayout={currentLayout}
+        onLayoutChange={setCurrentLayout}
+      />
     }
   ]
 
@@ -98,6 +104,7 @@ function App() {
         apps={apps} 
         onAppOpen={handleAppOpen}
         currentWallpaper={currentWallpaper}
+        currentLayout={currentLayout}
       />
     </div>
   )
