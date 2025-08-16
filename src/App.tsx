@@ -18,7 +18,7 @@ function App() {
     {
       id: "tictactoe",
       name: "Tic Tac Toe",
-      icon: <X className="w-8 h-8" />,
+      icon: <X className="w-8 h-8 text-stone-800" />,
       color: "bg-blue-500",
       component: TicTacToe
     }
