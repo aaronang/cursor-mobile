@@ -1,7 +1,8 @@
 import { useState } from "react"
 import { AppLauncher } from "./components/AppLauncher"
 import { TicTacToe } from "./components/TicTacToe"
-import { X } from "lucide-react"
+import { Sudoku } from "./components/Sudoku"
+import { X, Grid3X3 } from "lucide-react"
 
 export type App = {
   id: string
@@ -21,6 +22,13 @@ function App() {
       icon: <X className="w-8 h-8 text-stone-50" />,
       color: "bg-blue-500",
       component: TicTacToe
+    },
+    {
+      id: "sudoku",
+      name: "Sudoku",
+      icon: <Grid3X3 className="w-8 h-8 text-stone-50" />,
+      color: "bg-blue-500",
+      component: Sudoku
     }
   ]
 

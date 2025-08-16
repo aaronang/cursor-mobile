@@ -9,7 +9,7 @@ export function AppLauncher({ apps, onAppOpen }: AppLauncherProps) {
   return (
     <div className="min-h-screen p-4 bg-stone-50">
       {/* App Grid */}
-      <div className="grid grid-cols-3 gap-6 max-w-sm mx-auto pt-20">
+      <div className="grid grid-cols-3 gap-6 max-w-sm mx-auto pt-12">
         {apps.map((app) => (
           <button
             key={app.id}
